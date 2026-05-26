@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Quiz Game{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Welcome To The Quiz</h1>
+    <p class="subtitle">Test your knowledge with {{ total }} questions. You have 15 minutes to complete the quiz.</p>
+    <ul class="subtitle" style="margin-bottom: 1.5rem; padding-left: 1.25rem;">
+        <li>{{ total }} multiple-choice questions</li>
+        <li>15-minute countdown timer</li>
+        <li>Results page with pie chart breakdown</li>
+    </ul>
+    <a href="{{ url_for('quiz') }}" class="btn">Start Quiz</a>
+</div>
+{% endblock %}

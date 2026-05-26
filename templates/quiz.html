@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - Quiz Game{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form id="quiz-form" method="post" action="{{ url_for('submit') }}">
+        <div class="timer-bar">
+            <span>Time remaining</span>
+            <span id="timer" class="timer">{{ duration_seconds // 60 }}:00</span>
+        </div>
+
+        {% for q in questions %}
+        {% set q_index = loop.index0 %}
+        <div class="question-block">
+            <h3>{{ loop.index }}. {{ q.question }}</h3>
+            <div class="options">
+                {% for option in q.options %}
+                {% set letter = option[0] %}
+                <label for="q{{ q_index }}_{{ letter }}">
+                    <input
+                        type="radio"
+                        id="q{{ q_index }}_{{ letter }}"
+                        name="q{{ q_index }}"
+                        value="{{ letter }}"
+                        required
+                    >
+                    {{ option }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="submit-row">
+            <button type="submit" class="btn">Submit Quiz</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const DURATION = {{ duration_seconds }};
+    let remaining = DURATION;
+    const timerEl = document.getElementById("timer");
+    const form = document.getElementById("quiz-form");
+    let submitted = false;
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return m + ":" + String(s).padStart(2, "0");
+    }
+
+    function submitQuiz() {
+        if (submitted) return;
+        submitted = true;
+        form.querySelectorAll("input[type=radio]").forEach(function (input) {
+            input.removeAttribute("required");
+        });
+        form.submit();
+    }
+
+    function tick() {
+        timerEl.textContent = formatTime(remaining);
+        timerEl.classList.remove("warning", "danger");
+
+        if (remaining <= 60) {
+            timerEl.classList.add("danger");
+        } else if (remaining <= 300) {
+            timerEl.classList.add("warning");
+        }
+
+        if (remaining <= 0) {
+            submitQuiz();
+            return;
+        }
+
+        remaining -= 1;
+        setTimeout(tick, 1000);
+    }
+
+    tick();
+</script>
+{% endblock %}

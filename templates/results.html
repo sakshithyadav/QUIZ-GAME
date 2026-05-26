@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Quiz Game{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Quiz Completed</h1>
+    <p class="subtitle">Here is how you performed</p>
+
+    <div class="stats-grid">
+        <div class="stat-box correct">
+            <div class="value">{{ correct }}</div>
+            <div>Correct</div>
+        </div>
+        <div class="stat-box wrong">
+            <div class="value">{{ wrong }}</div>
+            <div>Wrong</div>
+        </div>
+        <div class="stat-box unanswered">
+            <div class="value">{{ unanswered }}</div>
+            <div>Unanswered</div>
+        </div>
+        <div class="stat-box">
+            <div class="value">{{ percentage }}%</div>
+            <div>Score</div>
+        </div>
+    </div>
+
+    <div class="chart-wrap">
+        <canvas id="resultsChart"></canvas>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('quiz') }}" class="btn">Try Again</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Home</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const correct = {{ correct }};
+    const wrong = {{ wrong }};
+    const unanswered = {{ unanswered }};
+
+    const labels = [];
+    const data = [];
+    const colors = [];
+
+    if (correct > 0) {
+        labels.push("Correct");
+        data.push(correct);
+        colors.push("#4ade80");
+    }
+    if (wrong > 0) {
+        labels.push("Wrong");
+        data.push(wrong);
+        colors.push("#f87171");
+    }
+    if (unanswered > 0) {
+        labels.push("Unanswered");
+        data.push(unanswered);
+        colors.push("#94a3b8");
+    }
+
+    if (data.length === 0) {
+        labels.push("No answers");
+        data.push(1);
+        colors.push("#64748b");
+    }
+
+    new Chart(document.getElementById("resultsChart"), {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderColor: "#0f172a",
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: { color: "#e2e8f0" }
+                },
+                title: {
+                    display: true,
+                    text: "Correct vs Wrong Answers",
+                    color: "#f1f5f9",
+                    font: { size: 16 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
